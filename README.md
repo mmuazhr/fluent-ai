@@ -32,7 +32,7 @@ Unlike a strict teacher, FluentAI acts as a supportive friend, counselor, and co
 
 ### Installation
 
-1. Clone the repository (or navigate to the `fluent-ai` directory).
+1. Clone the repository.
 2. Install dependencies:
    ```bash
    pip install -r backend/requirements.txt
@@ -55,3 +55,10 @@ Unlike a strict teacher, FluentAI acts as a supportive friend, counselor, and co
 - `backend/`: FastAPI server, LLM integration, and database models.
 - `frontend/`: Chat interface and voice interaction logic.
 - `db/`: Local SQLite database.
+
+## Tests
+
+```bash
+pip install -r backend/requirements-dev.txt
+pytest backend/tests/
+```
