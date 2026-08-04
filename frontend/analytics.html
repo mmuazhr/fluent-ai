@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balqis — Analytics</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { overflow: auto; }
+
+    .analytics-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 24px 20px 60px;
+    }
+
+    .analytics-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+
+    .analytics-header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .back-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-glass);
+      transition: all var(--transition);
+    }
+    .back-link:hover { background: var(--bg-glass-strong); color: var(--text-primary); }
+
+    /* Usage bar */
+    .usage-widget {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .usage-widget-label { font-size: 13px; color: var(--text-secondary); white-space: nowrap; }
+    .usage-widget-bar-wrap { flex: 1; }
+    .usage-widget-track {
+      height: 6px;
+      border-radius: 3px;
+      background: var(--bg-glass-strong);
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .usage-widget-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: var(--success);
+      transition: width 0.4s ease, background 0.4s ease;
+    }
+    .usage-widget-fill.warn { background: var(--warning); }
+    .usage-widget-fill.danger { background: var(--error); }
+    .usage-widget-count { font-size: 12px; color: var(--text-muted); }
+
+    /* Model bars */
+    .model-bars {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 20px;
+    }
+    .model-bars-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+    .model-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .model-row:last-child { margin-bottom: 0; }
+    .model-name {
+      font-size: 12px;
+      color: var(--text-secondary);
+      width: 170px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-shrink: 0;
+    }
+    .model-bar-track {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--bg-glass-strong);
+      overflow: hidden;
+    }
+    .model-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: var(--success);
+      transition: width 0.4s ease, background 0.4s ease;
+    }
+    .model-bar-fill.warn { background: var(--warning); }
+    .model-bar-fill.danger { background: var(--error); }
+    .model-bar-fill.exhausted { background: var(--error); opacity: 0.5; }
+    .model-count {
+      font-size: 11px;
+      color: var(--text-muted);
+      width: 70px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .model-active-badge {
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 8px;
+      background: rgba(74,222,128,0.15);
+      color: var(--success);
+      flex-shrink: 0;
+    }
+
+    /* Summary cards */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 600px) { .summary-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .summary-card {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius);
+      padding: 18px 16px;
+      text-align: center;
+    }
+    .summary-card .value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent);
+      display: block;
+    }
+    .summary-card .label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }
+
+    /* Section */
+    .analytics-section { margin-bottom: 28px; }
+    .analytics-section h2 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-glass);
+    }
+
+    /* Fluency trend */
+    .trend-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      height: 80px;
+      padding: 0 4px;
+    }
+    .trend-bar-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+    }
+    .trend-bar {
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+      background: var(--accent);
+      opacity: 0.7;
+      transition: opacity var(--transition);
+      min-height: 4px;
+    }
+    .trend-bar:hover { opacity: 1; }
+    .trend-label { font-size: 9px; color: var(--text-muted); text-align: center; }
+    .trend-score { font-size: 10px; color: var(--text-secondary); }
+
+    /* Weakness */
+    .weakness-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-glass);
+    }
+    .weakness-row:last-child { border-bottom: none; }
+    .category-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .category-badge.grammar { background: rgba(248,113,113,0.15); color: var(--error); }
+    .category-badge.filler { background: rgba(251,191,36,0.15); color: var(--warning); }
+    .category-badge.phrasing { background: rgba(108,99,255,0.15); color: var(--accent); }
+    .category-badge.vocab { background: rgba(74,222,128,0.15); color: var(--success); }
+    .category-badge.confidence { background: rgba(167,139,250,0.15); color: #a78bfa; }
+    .category-badge.fluency { background: rgba(251,191,36,0.15); color: var(--warning); }
+    .category-badge.tone { background: rgba(244,114,182,0.15); color: #f472b6; }
+
+    .weakness-pattern { flex: 1; font-size: 13px; color: var(--text-primary); }
+    .weakness-freq-wrap { display: flex; align-items: center; gap: 8px; }
+    .weakness-freq-bar {
+      height: 4px;
+      border-radius: 2px;
+      background: var(--accent);
+      opacity: 0.6;
+    }
+    .weakness-freq-num { font-size: 12px; color: var(--text-muted); width: 20px; text-align: right; }
+
+    /* Vocab */
+    .vocab-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+    }
+    .vocab-item .word { font-weight: 600; color: var(--accent); }
+    .vocab-item .surfaced { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .learn-btn {
+      background: var(--bg-glass-strong);
+      border: 1px solid var(--border-glass);
+      color: var(--text-secondary);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .learn-btn:hover { background: rgba(74,222,128,0.15); border-color: rgba(74,222,128,0.3); color: var(--success); }
+
+    /* Session history */
+    .session-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      transition: all var(--transition);
+    }
+    .session-item:hover { background: var(--bg-glass-strong); }
+    .session-topic { font-size: 14px; font-weight: 500; }
+    .session-meta { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+    .session-score { font-size: 20px; font-weight: 700; color: var(--accent); }
+
+    .empty-state { text-align: center; padding: 40px; color: var(--text-muted); font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="analytics-container">
+    <div class="analytics-header">
+      <h1>Progress Analytics</h1>
+      <a href="/" class="back-link">← Back to Chat</a>
+    </div>
+
+    <!-- API Usage -->
+    <div class="usage-widget">
+      <span class="usage-widget-label">Free tier today</span>
+      <div class="usage-widget-bar-wrap">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span class="usage-widget-count" id="usageCount">— / 500 requests</span>
+          <span class="usage-widget-count" id="usagePct">0%</span>
+        </div>
+        <div class="usage-widget-track">
+          <div class="usage-widget-fill" id="usageFill" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Model Usage Bars -->
+    <div class="model-bars">
+      <div class="model-bars-title">Model Free Tier Usage (today)</div>
+      <div id="modelBarsContainer"></div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-grid">
+      <div class="summary-card">
+        <span class="value" id="totalSessions">-</span>
+        <span class="label">Sessions</span>
+      </div>
+      <div class="summary-card">
+        <span class="value" id="avgFluency">-</span>
+        <span class="label">Avg Fluency</span>
+      </div>
+      <div class="summary-card">
+        <span class="value" id="totalTurns">-</span>
+        <span class="label">Total Turns</span>
+      </div>
+      <div class="summary-card">
+        <span class="value" id="vocabGapCount">-</span>
+        <span class="label">Vocab Gaps</span>
+      </div>
+    </div>
+
+    <!-- Fluency Trend -->
+    <div class="analytics-section">
+      <h2>Fluency Trend</h2>
+      <div class="trend-chart" id="trendChart">
+        <div class="empty-state">Complete a session to see your trend.</div>
+      </div>
+    </div>
+
+    <!-- Top Weaknesses -->
+    <div class="analytics-section">
+      <h2>Recurring Weaknesses</h2>
+      <div id="weaknessContainer"><div class="empty-state">Loading...</div></div>
+    </div>
+
+    <!-- Vocab -->
+    <div class="analytics-section">
+      <h2>Vocabulary to Learn</h2>
+      <div id="vocabContainer"><div class="empty-state">Loading...</div></div>
+    </div>
+
+    <!-- Session History -->
+    <div class="analytics-section">
+      <h2>Session History</h2>
+      <div id="sessionsContainer"><div class="empty-state">Loading...</div></div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:8000';
+
+    async function loadAll() {
+      await Promise.all([loadUsage(), loadAnalytics()]);
+    }
+
+    const MODEL_CHAIN = [
+      { name: 'gemini-2.0-flash',         limit: 1500 },
+      { name: 'gemini-2.0-flash-lite',    limit: 1500 },
+      { name: 'gemini-flash-lite-latest', limit: 1500 },
+      { name: 'gemini-2.5-flash-lite',    limit: 500  },
+      { name: 'gemini-2.5-flash',         limit: 20   },
+    ];
+
+    async function loadUsage() {
+      try {
+        const res = await fetch(`${API_BASE}/analytics/usage`);
+        const d = await res.json();
+        const pct = Math.min((d.daily_requests / d.daily_request_limit) * 100, 100);
+        document.getElementById('usageCount').textContent = `${d.daily_requests} / ${d.daily_request_limit} requests`;
+        document.getElementById('usagePct').textContent = `${pct.toFixed(1)}%`;
+        const fill = document.getElementById('usageFill');
+        fill.style.width = `${pct}%`;
+        fill.className = 'usage-widget-fill' + (pct >= 80 ? ' danger' : pct >= 60 ? ' warn' : '');
+
+        renderModelBars(d.model_requests || {}, d.daily_request_limit);
+      } catch (_) {}
+    }
+
+    function renderModelBars(modelRequests, currentLimit) {
+      const container = document.getElementById('modelBarsContainer');
+      // The active model is the one matching the current daily_limit
+      const activeModel = MODEL_CHAIN.find(m => m.limit === currentLimit)?.name || '';
+
+      container.innerHTML = MODEL_CHAIN.map(m => {
+        const used = modelRequests[m.name] || 0;
+        const pct = Math.min((used / m.limit) * 100, 100);
+        const exhausted = pct >= 100;
+        const fillClass = exhausted ? 'exhausted' : pct >= 80 ? 'danger' : pct >= 60 ? 'warn' : '';
+        const isActive = m.name === activeModel && !exhausted;
+
+        return `
+          <div class="model-row">
+            <span class="model-name" title="${m.name}">${m.name}</span>
+            <div class="model-bar-track">
+              <div class="model-bar-fill ${fillClass}" style="width:${Math.max(pct, used > 0 ? 1 : 0)}%"></div>
+            </div>
+            <span class="model-count">${used} / ${m.limit}</span>
+            ${isActive ? '<span class="model-active-badge">active</span>' : ''}
+          </div>`;
+      }).join('');
+    }
+
+    async function loadAnalytics() {
+      try {
+        const [summaryRes, weakRes, vocabRes, sessRes] = await Promise.all([
+          fetch(`${API_BASE}/analytics/summary`),
+          fetch(`${API_BASE}/analytics/weaknesses`),
+          fetch(`${API_BASE}/analytics/vocab?learned=false`),
+          fetch(`${API_BASE}/sessions/`),
+        ]);
+
+        const summary = await summaryRes.json();
+        const weaknesses = await weakRes.json();
+        const vocab = await vocabRes.json();
+        const sessions = await sessRes.json();
+
+        // Stats
+        document.getElementById('totalSessions').textContent = summary.total_sessions || 0;
+        document.getElementById('totalTurns').textContent = summary.total_turns || 0;
+        document.getElementById('avgFluency').textContent =
+          summary.avg_fluency_score ? `${summary.avg_fluency_score}/10` : '-';
+        document.getElementById('vocabGapCount').textContent = summary.vocab_gap_count || 0;
+
+        renderTrend(sessions);
+        renderWeaknesses(weaknesses);
+        renderVocab(vocab);
+        renderSessions(sessions);
+
+      } catch (e) {
+        console.error(e);
+        document.getElementById('weaknessContainer').innerHTML =
+          '<div class="empty-state">Could not load data. Is the backend running?</div>';
+      }
+    }
+
+    function renderTrend(sessions) {
+      const container = document.getElementById('trendChart');
+      const scored = sessions.filter(s => s.fluency_score).slice(0, 12).reverse();
+      if (!scored.length) return;
+
+      container.innerHTML = scored.map(s => {
+        const pct = (s.fluency_score / 10) * 100;
+        const date = new Date(s.started_at).toLocaleDateString('en', { month: 'short', day: 'numeric' });
+        return `
+          <div class="trend-bar-wrap" title="${s.topic || 'Session'} — ${s.fluency_score}/10">
+            <span class="trend-score">${s.fluency_score}</span>
+            <div class="trend-bar" style="height:${pct}%"></div>
+            <span class="trend-label">${date}</span>
+          </div>`;
+      }).join('');
+    }
+
+    function renderWeaknesses(data) {
+      const container = document.getElementById('weaknessContainer');
+      if (!data.length) {
+        container.innerHTML = '<div class="empty-state">No patterns tracked yet.</div>';
+        return;
+      }
+      const maxFreq = Math.max(...data.map(d => d.frequency));
+      container.innerHTML = data.map(w => `
+        <div class="weakness-row">
+          <span class="category-badge ${w.category}">${w.category}</span>
+          <span class="weakness-pattern">${w.pattern}</span>
+          <div class="weakness-freq-wrap">
+            <div class="weakness-freq-bar" style="width:${Math.max((w.frequency / maxFreq) * 60, 8)}px"></div>
+            <span class="weakness-freq-num">${w.frequency}×</span>
+          </div>
+        </div>`).join('');
+    }
+
+    function renderVocab(data) {
+      const container = document.getElementById('vocabContainer');
+      if (!data.length) {
+        container.innerHTML = '<div class="empty-state">No vocabulary gaps yet.</div>';
+        return;
+      }
+      container.innerHTML = data.map(v => `
+        <div class="vocab-item">
+          <div>
+            <span class="word">${v.word}</span>${v.meaning ? ` — ${v.meaning}` : ''}
+            <div class="surfaced">Surfaced ${v.times_surfaced}×</div>
+          </div>
+          <button class="learn-btn" onclick="markLearned('${v.id}', this)">✓ Learned</button>
+        </div>`).join('');
+    }
+
+    function renderSessions(data) {
+      const container = document.getElementById('sessionsContainer');
+      if (!data.length) {
+        container.innerHTML = '<div class="empty-state">No sessions yet.</div>';
+        return;
+      }
+      container.innerHTML = data.map(s => {
+        const date = new Date(s.started_at).toLocaleDateString('en', { weekday: 'short', month: 'short', day: 'numeric' });
+        const duration = s.ended_at
+          ? Math.round((new Date(s.ended_at) - new Date(s.started_at)) / 60000) + ' min'
+          : 'ongoing';
+        return `
+          <div class="session-item">
+            <div>
+              <div class="session-topic">${s.topic || 'Untitled session'}</div>
+              <div class="session-meta">${date} · ${s.total_turns} turns · ${duration}</div>
+            </div>
+            <div class="session-score">${s.fluency_score ? s.fluency_score + '/10' : '—'}</div>
+          </div>`;
+      }).join('');
+    }
+
+    async function markLearned(id, btn) {
+      try {
+        await fetch(`${API_BASE}/analytics/vocab/${id}/learned`, { method: 'PATCH' });
+        btn.closest('.vocab-item').style.opacity = '0.3';
+        btn.textContent = '✓ Done';
+        btn.disabled = true;
+      } catch (_) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', loadAll);
+  </script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Balqis — Your personal English communication companion. Improve fluency through natural conversations.">
+  <title>Balqis — English Communication Companion</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container" id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <span class="logo">Balqis</span>
+        <div class="status-badge" id="statusBadge">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">Ready</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="usage-bar-wrap" id="usageBarWrap" title="Gemini free tier: daily requests">
+          <span class="usage-label" id="usageLabel">0 / 500</span>
+          <div class="usage-bar-track">
+            <div class="usage-bar-fill" id="usageBarFill"></div>
+          </div>
+        </div>
+        <div id="sessionControls" style="display: none; align-items: center; gap: 8px;">
+          <button class="mute-btn" id="muteBtn" title="Toggle voice output">🔊</button>
+          <button class="header-btn" id="analyticsBtn" onclick="window.open('analytics.html','_blank')">📊</button>
+          <button class="header-btn danger" id="endSessionBtn">End</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Welcome Screen -->
+    <div class="welcome-screen" id="welcomeScreen">
+      <h1>Balqis</h1>
+      <p>Your personal English communication companion. Not a teacher — a smart, supportive friend who helps you speak naturally and confidently.</p>
+      <button class="start-btn" id="startBtn">Start Conversation</button>
+    </div>
+
+    <!-- Chat Area (hidden until session starts) -->
+    <div class="chat-area" id="chatArea" style="display: none;"></div>
+
+    <!-- Typing Indicator -->
+    <div class="typing-indicator" id="typingIndicator">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    </div>
+
+    <!-- Input Area (hidden until session starts) -->
+    <div class="input-area" id="inputArea" style="display: none;">
+      <div class="transcript-preview" id="transcriptPreview"></div>
+      <div class="input-row">
+        <button class="mic-btn" id="micBtn" title="Hold to speak">🎙️</button>
+        <textarea class="text-input" id="textInput" placeholder="Type or hold mic to speak..." rows="1"></textarea>
+        <button class="send-btn" id="sendBtn" title="Send message">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reflection Modal -->
+  <div class="modal-overlay" id="reflectionModal">
+    <div class="modal">
+      <h2>Session Reflection</h2>
+      <p class="session-title" id="reflectionTitle"></p>
+
+      <div class="fluency-score">
+        <div class="score-ring">
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <circle class="bg" cx="50" cy="50" r="42"></circle>
+            <circle class="progress" id="scoreProgress" cx="50" cy="50" r="42"
+              stroke-dasharray="264" stroke-dashoffset="264"></circle>
+          </svg>
+          <div class="score-value">
+            <span id="scoreNumber">0</span>
+            <span class="score-label">Fluency</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="reflection-section">
+        <h3>✅ What you did well</h3>
+        <ul class="reflection-list" id="wentWellList"></ul>
+      </div>
+
+      <div class="reflection-section">
+        <h3>🔄 Recurring patterns</h3>
+        <ul class="reflection-list" id="mistakesList"></ul>
+      </div>
+
+      <div class="reflection-section">
+        <h3>📝 Vocabulary to learn</h3>
+        <ul class="reflection-list" id="vocabList"></ul>
+      </div>
+
+      <div class="encouragement" id="encouragementText"></div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="window.open('analytics.html','_blank')">View Analytics</button>
+        <button class="btn-primary" id="newSessionBtn">New Conversation</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/voice_input.js"></script>
+  <script src="js/voice_output.js"></script>
+  <script src="js/chat.js"></script>
+</body>
+</html>
